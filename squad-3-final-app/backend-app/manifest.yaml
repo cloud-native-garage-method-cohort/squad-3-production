@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: backend-app
+  name: backend-app
+spec:
+  ports:
+  - port: 9010
+    protocol: TCP
+  selector:
+    app: backend-app
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: backend-app
+  name: backend-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend-app
+  template:
+    metadata:
+      labels:
+        app: backend-app
+    spec:
+      containers:
+      - env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              key: DATABASE_URL
+              name: backend
+        - name: DATABASE_PORT
+          valueFrom:
+            secretKeyRef:
+              key: DATABASE_PORT
+              name: backend
+        - name: DATABASE_NAME
+          valueFrom:
+            secretKeyRef:
+              key: DATABASE_NAME
+              name: backend
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: DATABASE_PASSWORD
+              name: backend
+        - name: DATABASE_USER
+          valueFrom:
+            secretKeyRef:
+              key: DATABASE_USER
+              name: backend
+        image: quay.io/tomasz_boczek/squad-3-backend@sha256:9f423a200ef1dcf54f09c899c59ff7d1aab13947b3cdc9917dbb5191aec76d44
+        name: backend-app
+        ports:
+        - containerPort: 9010
